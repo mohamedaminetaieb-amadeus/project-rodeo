@@ -64,7 +64,7 @@
     },
     "databaseType": {
       "type": "string",
-      "defaultValue": "PostgreSQL",
+      "defaultValue": "CosmosDB",
       "allowedValues": [
         "PostgreSQL",
         "CosmosDB"
@@ -17394,7 +17394,7 @@
             "value": "16"
           },
           "availabilityZone": {
-            "value": 1
+            "value": -1
           },
           "highAvailability": "[if(parameters('enableRedundancy'), createObject('value', 'ZoneRedundant'), createObject('value', 'Disabled'))]",
           "highAvailabilityZone": "[if(parameters('enableRedundancy'), createObject('value', 2), createObject('value', -1))]",

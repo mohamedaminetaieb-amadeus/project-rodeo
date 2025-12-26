@@ -50,7 +50,7 @@ param hostingPlanSku string = 'B3'
   'PostgreSQL'
   'CosmosDB'
 ])
-param databaseType string = 'PostgreSQL'
+param databaseType string = 'CosmosDB'
 
 @description('Azure Cosmos DB Account Name.')
 var azureCosmosDBAccountName string = 'cosmos-${solutionSuffix}'
@@ -776,7 +776,7 @@ module postgresDBModule 'br/public:avm/res/db-for-postgre-sql/flexible-server:0.
     tier: enableScalability ? 'GeneralPurpose' : 'Burstable'
     storageSizeGB: 32
     version: '16'
-    availabilityZone: 1
+    availabilityZone: -1
     highAvailability: enableRedundancy ? 'ZoneRedundant' : 'Disabled'
     highAvailabilityZone: enableRedundancy ? 2 : -1
     publicNetworkAccess: enablePrivateNetworking ? 'Disabled' : 'Enabled'
