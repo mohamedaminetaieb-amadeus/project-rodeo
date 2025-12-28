@@ -155,7 +155,62 @@ class QuestionAnswerTool(AnsweringToolBase):
 
     def answer_question(self, question: str, chat_history: list[dict], **kwargs):
         logger.info("Answering question")
-        source_documents = Search.get_source_documents(self.search_handler, question)
+        # First, ask the LLM to detect whether the input contains a spec excerpt
+        # and to generate a concise search query to use against the vector store.
+        spec_prompt = ConfigHelper.get_default_spec_assistant()
+        llm = self.llm_helper
+        system_message = self.env_helper.AZURE_OPENAI_SYSTEM_MESSAGE or "You are a helpful assistant."
+
+        messages_for_detection = [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": spec_prompt + "\n\nUser Input:\n" + question},
+        ]
+
+        try:
+            detection_resp = llm.get_chat_completion(messages_for_detection, temperature=0)
+            detection_text = detection_resp.choices[0].message.content
+            try:
+                detection_json = json.loads(detection_text)
+            except Exception:
+                logger.warning("Spec detection JSON parse failed, defaulting to non-spec.")
+                detection_json = {"is_spec": False, "excerpt": "", "search_query": "", "intent": "other", "wants_score": False}
+        except Exception:
+            logger.exception("Spec detection LLM call failed; continuing with direct question search")
+            detection_json = {"is_spec": False, "excerpt": "", "search_query": "", "intent": "other", "wants_score": False}
+
+        # Decide which query to use for retrieval
+        if detection_json.get("is_spec") and detection_json.get("search_query"):
+            retrieval_query = detection_json.get("search_query")
+            excerpt_text = detection_json.get("excerpt") or question
+            wants_score = detection_json.get("wants_score", False)
+        else:
+            retrieval_query = question
+            excerpt_text = question
+            wants_score = False
+
+        source_documents = Search.get_source_documents(self.search_handler, retrieval_query)
+
+        # If we couldn't retrieve any supporting documents, fallback to direct LLM answering
+        if not source_documents:
+            logger.info("No source documents retrieved; falling back to LLM-only answer.")
+            # Build a message instructing the LLM to answer using general knowledge and the excerpt
+            fallback_user = (
+                f"User input: {question}\n\n"
+                "No relevant documents were found in the RAG. Answer using your general knowledge"
+            )
+            if detection_json.get("is_spec") and excerpt_text:
+                fallback_user += f" and consider this excerpt to review:\n{excerpt_text}\n"
+            if wants_score:
+                fallback_user += "Provide a numeric score (1-10) and brief justification for the quality of the draft.\n"
+
+            fallback_messages = [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": fallback_user},
+            ]
+
+            response = llm.get_chat_completion(fallback_messages, temperature=0)
+            clean_answer = self.format_answer_from_response(response, question, [])
+            return clean_answer
 
         if self.env_helper.USE_ADVANCED_IMAGE_PROCESSING:
             image_urls = self.create_image_url_list(source_documents)
