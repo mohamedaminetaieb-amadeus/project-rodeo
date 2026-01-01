@@ -24,7 +24,7 @@ export const AssistantTypeSection: React.FC<AssistantTypeSectionProps> = ({
         src={Azure}
         className={styles.chatIcon}
         aria-hidden="true"
-        alt="Chat with your data"
+        alt="Prodeo SpecReviewer"
       />
       {assistantType === assistantTypes.contractAssistant ? (
         <>
@@ -37,11 +37,11 @@ export const AssistantTypeSection: React.FC<AssistantTypeSectionProps> = ({
       ) : assistantType === assistantTypes.default ? (
         <>
           <h1 className={styles.chatEmptyStateTitle}>
-            Chat with your
-            <span className={styles.dataText}>&nbsp;Data</span>
+            Prodeo
+            <span className={styles.dataText}>&nbsp;SpecReviewer</span>
           </h1>
           <h2 className={styles.chatEmptyStateSubtitle}>
-            This chatbot is configured to answer your questions
+            This chatbot is configured to review and improve your specifications
           </h2>
         </>
       ) : null}

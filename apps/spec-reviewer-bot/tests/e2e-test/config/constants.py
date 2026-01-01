@@ -28,7 +28,7 @@ with open(json_file_path, "r") as file:
 
 
 # Admin Page input data
-admin_page_title = "Chat with your data Solution Accelerator"
+admin_page_title = "Prodeo Administrator Dashboard"
 upload_file_success_message = "Embeddings computation in progress."
 upload_page_url = "https://plasticsmartcities.org/public-awareness/"
 upload_url_success_message = "Embeddings added successfully for"

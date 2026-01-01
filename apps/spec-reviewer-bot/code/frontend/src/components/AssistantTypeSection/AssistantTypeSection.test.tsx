@@ -39,10 +39,12 @@ describe("AssistantTypeSection", () => {
       />
     );
 
-    expect(screen.getByText("Chat with your")).toBeInTheDocument();
-    //expect(screen.getByText("\u00a0Data")).toBeInTheDocument();
+    expect(screen.getByText("Prodeo")).toBeInTheDocument();
+    expect(screen.getByText("SpecReviewer")).toBeInTheDocument();
     expect(
-      screen.getByText("This chatbot is configured to answer your questions")
+      screen.getByText(
+        "This chatbot is configured to review and improve your specifications"
+      )
     ).toBeInTheDocument();
     expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def validate_admin_page_loaded(page, admin_page, home_page):
     page.goto(ADMIN_URL)
     actual_title = page.locator(admin_page.ADMIN_PAGE_TITLE).text_content()
-    assert actual_title == "Chat with your data Solution Accelerator", "Admin page title mismatch"
+    assert actual_title == "Prodeo Administrator Dashboard", "Admin page title mismatch"
 
 
 
